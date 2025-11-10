@@ -17,34 +17,68 @@ class ContentEditor {
      * @param {Object} menuStructure - Menu structure object
      */
     initialize(template, menuStructure) {
-        this.template = template;
-        this.menuStructure = JSON.parse(JSON.stringify(menuStructure)); // Deep clone
-        this.editedContent = this.menuStructure;
-        this.formContainer = document.getElementById('editor-form');
+        console.log('ContentEditor.initialize called');
+        console.log('Template:', template);
+        console.log('Menu structure:', menuStructure);
 
-        this.render();
+        try {
+            this.template = template;
+            this.menuStructure = JSON.parse(JSON.stringify(menuStructure)); // Deep clone
+            this.editedContent = this.menuStructure;
+            this.formContainer = document.getElementById('editor-form');
+
+            if (!this.formContainer) {
+                throw new Error('editor-form element not found in DOM');
+            }
+
+            console.log('About to render editor form...');
+            this.render();
+            console.log('Editor form rendered successfully');
+        } catch (error) {
+            console.error('Error in ContentEditor.initialize:', error);
+            throw error;
+        }
     }
 
     /**
      * Render the editor form
      */
     render() {
-        if (!this.formContainer) return;
+        console.log('ContentEditor.render called');
 
-        this.formContainer.innerHTML = '';
-
-        // Render restaurant name if available
-        if (this.menuStructure.metadata.restaurantName) {
-            this.renderRestaurantName();
+        if (!this.formContainer) {
+            console.error('formContainer is null, cannot render');
+            return;
         }
 
-        // Render each section
-        this.editedContent.sections.forEach((section, sectionIndex) => {
-            this.renderSection(section, sectionIndex);
-        });
+        try {
+            this.formContainer.innerHTML = '';
 
-        // Add new section button
-        this.renderAddSectionButton();
+            // Render restaurant name if available
+            if (this.menuStructure && this.menuStructure.metadata && this.menuStructure.metadata.restaurantName) {
+                console.log('Rendering restaurant name');
+                this.renderRestaurantName();
+            }
+
+            // Render each section
+            if (this.editedContent && this.editedContent.sections) {
+                console.log('Rendering sections:', this.editedContent.sections.length);
+                this.editedContent.sections.forEach((section, sectionIndex) => {
+                    this.renderSection(section, sectionIndex);
+                });
+            } else {
+                console.error('No sections to render');
+            }
+
+            // Add new section button
+            console.log('Adding new section button');
+            this.renderAddSectionButton();
+
+            console.log('Render complete');
+        } catch (error) {
+            console.error('Error in render:', error);
+            throw error;
+        }
     }
 
     /**

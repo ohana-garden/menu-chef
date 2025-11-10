@@ -139,11 +139,19 @@ class MenuChefApp {
                 menuStructure: this.currentMenuStructure
             });
 
-            this.updateProgress(100, 'Complete!');
+            this.updateProgress(100, 'Complete! Loading editor...');
 
-            // Wait a moment then show editor
+            console.log('About to call showEditor');
+
+            // Show editor immediately
             setTimeout(() => {
-                this.showEditor();
+                console.log('Timeout fired, calling showEditor');
+                try {
+                    this.showEditor();
+                } catch (error) {
+                    console.error('Error in timeout showEditor:', error);
+                    alert('Error: ' + error.message + '\n\nCheck the console for details.');
+                }
             }, 500);
 
         } catch (error) {
@@ -157,9 +165,25 @@ class MenuChefApp {
      * Show editor with current template
      */
     showEditor() {
-        window.contentEditor.initialize(this.currentTemplate, this.currentMenuStructure);
-        this.refreshPreview();
-        this.showSection('editor');
+        console.log('showEditor called');
+        console.log('Template:', this.currentTemplate);
+        console.log('Menu structure:', this.currentMenuStructure);
+
+        try {
+            console.log('Initializing content editor...');
+            window.contentEditor.initialize(this.currentTemplate, this.currentMenuStructure);
+
+            console.log('Refreshing preview...');
+            this.refreshPreview();
+
+            console.log('Showing editor section...');
+            this.showSection('editor');
+
+            console.log('Editor section should now be visible');
+        } catch (error) {
+            console.error('Error in showEditor:', error);
+            alert('Error showing editor: ' + error.message);
+        }
     }
 
     /**
