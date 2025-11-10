@@ -1,0 +1,24 @@
+{
+  "name": "menu-chef",
+  "version": "1.0.0",
+  "description": "Restaurant Menu PDF Template Generator - Extract design templates from menu PDFs and regenerate with updated content",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "serve": "python3 -m http.server 8000"
+  },
+  "keywords": [
+    "pdf",
+    "menu",
+    "restaurant",
+    "template",
+    "generator",
+    "pdf-parser",
+    "pdf-generator"
+  ],
+  "author": "Menu Chef",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ohana-garden/menu-chef"
+  }
+}
