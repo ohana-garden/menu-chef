@@ -103,9 +103,11 @@ class ContentEditor {
 
         // Add event listener
         const input = nameGroup.querySelector('#restaurant-name');
-        input.addEventListener('input', (e) => {
-            this.editedContent.metadata.restaurantName = e.target.value;
-        });
+        if (input) {
+            input.addEventListener('input', (e) => {
+                this.editedContent.metadata.restaurantName = e.target.value;
+            });
+        }
     }
 
     /**
@@ -133,9 +135,11 @@ class ContentEditor {
 
         // Add event listeners for section header
         const nameElement = sectionHeader.querySelector('.section-name-editable');
-        nameElement.addEventListener('blur', (e) => {
-            this.editedContent.sections[sectionIndex].name = e.target.textContent.trim();
-        });
+        if (nameElement) {
+            nameElement.addEventListener('blur', (e) => {
+                this.editedContent.sections[sectionIndex].name = e.target.textContent.trim();
+            });
+        }
 
         const moveUpBtn = sectionHeader.querySelector('.move-section-up');
         moveUpBtn?.addEventListener('click', () => this.moveSection(sectionIndex, -1));
@@ -144,7 +148,9 @@ class ContentEditor {
         moveDownBtn?.addEventListener('click', () => this.moveSection(sectionIndex, 1));
 
         const deleteBtn = sectionHeader.querySelector('.delete-section');
-        deleteBtn.addEventListener('click', () => this.deleteSection(sectionIndex));
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', () => this.deleteSection(sectionIndex));
+        }
 
         // Render items in section
         section.items.forEach((item, itemIndex) => {
@@ -226,19 +232,25 @@ class ContentEditor {
         const descInput = itemDiv.querySelector('.item-description');
         const priceInput = itemDiv.querySelector('.item-price');
 
-        nameInput.addEventListener('input', (e) => {
-            this.updateItem(sectionIndex, itemIndex, 'name', e.target.value);
-            this.updateCharCounter(e.target);
-        });
+        if (nameInput) {
+            nameInput.addEventListener('input', (e) => {
+                this.updateItem(sectionIndex, itemIndex, 'name', e.target.value);
+                this.updateCharCounter(e.target);
+            });
+        }
 
-        descInput.addEventListener('input', (e) => {
-            this.updateItem(sectionIndex, itemIndex, 'description', e.target.value);
-            this.updateCharCounter(e.target);
-        });
+        if (descInput) {
+            descInput.addEventListener('input', (e) => {
+                this.updateItem(sectionIndex, itemIndex, 'description', e.target.value);
+                this.updateCharCounter(e.target);
+            });
+        }
 
-        priceInput.addEventListener('input', (e) => {
-            this.updateItem(sectionIndex, itemIndex, 'price', e.target.value);
-        });
+        if (priceInput) {
+            priceInput.addEventListener('input', (e) => {
+                this.updateItem(sectionIndex, itemIndex, 'price', e.target.value);
+            });
+        }
 
         // Move and delete buttons
         const moveUpBtn = itemDiv.querySelector('.move-item-up');
@@ -248,7 +260,9 @@ class ContentEditor {
         moveDownBtn?.addEventListener('click', () => this.moveItem(sectionIndex, itemIndex, 1));
 
         const deleteBtn = itemDiv.querySelector('.delete-item');
-        deleteBtn.addEventListener('click', () => this.deleteItem(sectionIndex, itemIndex));
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', () => this.deleteItem(sectionIndex, itemIndex));
+        }
 
         return itemDiv;
     }
