@@ -125,7 +125,7 @@ class ContentEditor {
             <div class="item-actions">
                 <button class="btn btn-small btn-secondary move-section-up" ${sectionIndex === 0 ? 'disabled' : ''}>↑</button>
                 <button class="btn btn-small btn-secondary move-section-down" ${sectionIndex === this.editedContent.sections.length - 1 ? 'disabled' : ''}>↓</button>
-                <button class="btn btn-small" style="background: #e74c3c; color: white;" class="delete-section">Delete Section</button>
+                <button class="btn btn-small delete-section" style="background: #e74c3c; color: white;">Delete Section</button>
             </div>
         `;
 
@@ -181,7 +181,7 @@ class ContentEditor {
                 <div class="item-actions">
                     <button class="btn btn-small btn-secondary move-item-up" ${itemIndex === 0 ? 'disabled' : ''}>↑</button>
                     <button class="btn btn-small btn-secondary move-item-down" ${itemIndex === this.editedContent.sections[sectionIndex].items.length - 1 ? 'disabled' : ''}>↓</button>
-                    <button class="btn btn-small" style="background: #e74c3c; color: white;" class="delete-item">×</button>
+                    <button class="btn btn-small delete-item" style="background: #e74c3c; color: white;">×</button>
                 </div>
             </div>
             <div class="form-group">
