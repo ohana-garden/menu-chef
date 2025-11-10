@@ -31,11 +31,19 @@ class MenuChefApp {
         const selectFileBtn = document.getElementById('select-file-btn');
 
         // File selection
-        selectFileBtn.addEventListener('click', () => fileInput.click());
+        selectFileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fileInput.click();
+        });
 
         fileInput.addEventListener('change', (e) => {
+            console.log('File input change event fired');
+            console.log('Files:', e.target.files);
             if (e.target.files.length > 0) {
+                console.log('File selected:', e.target.files[0].name);
                 this.handleFileUpload(e.target.files[0]);
+            } else {
+                console.log('No file selected');
             }
         });
 
@@ -98,11 +106,17 @@ class MenuChefApp {
      */
     async handleFileUpload(file) {
         try {
+            console.log('handleFileUpload called with:', file);
+            console.log('File type:', file.type);
+            console.log('File size:', file.size);
+
             this.showSection('analysis');
             this.updateProgress(0, 'Starting...');
 
             // Parse PDF
+            console.log('Starting PDF parse...');
             const pdfData = await window.pdfParser.parsePDF(file, (progress, message) => {
+                console.log(`Progress: ${progress}% - ${message}`);
                 this.updateProgress(progress, message);
             });
 
