@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Chef - Restaurant Menu PDF Template Generator</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍽️ Menu Chef</h1>
+            <p>Extract design templates from restaurant menu PDFs and regenerate with updated content</p>
+        </header>
+
+        <main>
+            <!-- Step 1: PDF Upload -->
+            <section id="upload-section" class="section active">
+                <h2>Step 1: Upload Menu PDF</h2>
+                <div class="upload-zone" id="upload-zone">
+                    <div class="upload-content">
+                        <svg class="upload-icon" viewBox="0 0 24 24" width="64" height="64">
+                            <path fill="currentColor" d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M12,11L16,15H13.5V19H10.5V15H8L12,11Z"/>
+                        </svg>
+                        <p>Drag & drop your menu PDF here</p>
+                        <p class="upload-or">or</p>
+                        <button class="btn btn-primary" id="select-file-btn">Select File</button>
+                        <input type="file" id="file-input" accept=".pdf" style="display: none;">
+                    </div>
+                </div>
+                <div id="upload-status" class="status-message"></div>
+                <div id="template-list" class="template-list" style="display: none;">
+                    <h3>Saved Templates</h3>
+                    <div id="templates-container"></div>
+                </div>
+            </section>
+
+            <!-- Step 2: Template Analysis (shown during processing) -->
+            <section id="analysis-section" class="section">
+                <h2>Step 2: Analyzing Template</h2>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill"></div>
+                    </div>
+                    <p id="analysis-status">Processing PDF...</p>
+                </div>
+                <div id="template-preview" class="template-preview"></div>
+            </section>
+
+            <!-- Step 3: Content Editor -->
+            <section id="editor-section" class="section">
+                <h2>Step 3: Edit Menu Content</h2>
+                <div class="editor-container">
+                    <div class="editor-sidebar">
+                        <div id="editor-form" class="editor-form"></div>
+                    </div>
+                    <div class="editor-preview">
+                        <div class="preview-header">
+                            <h3>Preview</h3>
+                            <button class="btn btn-secondary" id="refresh-preview-btn">Refresh Preview</button>
+                        </div>
+                        <div id="preview-canvas-container" class="preview-canvas-container">
+                            <canvas id="preview-canvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="editor-actions">
+                    <button class="btn btn-secondary" id="back-to-upload-btn">← Back to Upload</button>
+                    <button class="btn btn-primary" id="generate-pdf-btn">Generate PDF →</button>
+                </div>
+            </section>
+
+            <!-- Step 4: PDF Generation -->
+            <section id="generation-section" class="section">
+                <h2>Step 4: Generate New Menu</h2>
+                <div id="generation-status" class="status-message"></div>
+                <div class="generation-actions">
+                    <button class="btn btn-secondary" id="edit-more-btn">← Edit More</button>
+                    <button class="btn btn-success" id="download-pdf-btn" disabled>Download PDF</button>
+                    <button class="btn btn-secondary" id="start-over-btn">Start Over</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Error Modal -->
+        <div id="error-modal" class="modal">
+            <div class="modal-content">
+                <h3>Error</h3>
+                <p id="error-message"></p>
+                <button class="btn btn-primary" id="close-error-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        // Configure PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
+    <!-- PDF Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Application Scripts -->
+    <script src="js/storage.js"></script>
+    <script src="js/pdfParser.js"></script>
+    <script src="js/templateExtractor.js"></script>
+    <script src="js/menuDetector.js"></script>
+    <script src="js/pdfGenerator.js"></script>
+    <script src="js/contentEditor.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
