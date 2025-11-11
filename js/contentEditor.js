@@ -54,6 +54,54 @@ class ContentEditor {
         try {
             this.formContainer.innerHTML = '';
 
+            // Check if we have valid menu structure
+            if (!this.editedContent || !this.editedContent.sections) {
+                console.error('Invalid menu structure:', this.editedContent);
+                this.formContainer.innerHTML = `
+                    <div class="section-group" style="background: #fff3cd; border-left: 4px solid #ffc107;">
+                        <h3 style="color: #856404;">⚠️ No Menu Items Detected</h3>
+                        <p style="color: #856404; margin-top: 10px;">
+                            The PDF you uploaded doesn't appear to contain detectable menu items with prices.
+                            This could happen if:
+                        </p>
+                        <ul style="margin-left: 20px; color: #856404; line-height: 1.8;">
+                            <li>The PDF is a scanned image (not text-based)</li>
+                            <li>The menu doesn't have price markers ($, €, £, ¥)</li>
+                            <li>The text is embedded as images</li>
+                        </ul>
+                        <p style="color: #856404; margin-top: 15px; font-weight: bold;">
+                            You can still create a menu manually by clicking the button below:
+                        </p>
+                    </div>
+                `;
+
+                // Create a default section
+                this.editedContent = {
+                    sections: [{
+                        name: 'Menu Items',
+                        items: [],
+                        position: { y: 0 },
+                        styling: { fontSize: 14, fontName: 'Arial', alignment: 'left' }
+                    }],
+                    metadata: { restaurantName: 'My Restaurant', totalItems: 0, priceRange: { min: 0, max: 0 } }
+                };
+                this.menuStructure = this.editedContent;
+
+                this.renderAddSectionButton();
+                return;
+            }
+
+            // Check if sections is empty
+            if (this.editedContent.sections.length === 0) {
+                console.warn('No sections found, creating default section');
+                this.editedContent.sections.push({
+                    name: 'Menu Items',
+                    items: [],
+                    position: { y: 0 },
+                    styling: { fontSize: 14, fontName: 'Arial', alignment: 'left' }
+                });
+            }
+
             // Render restaurant name if available
             if (this.menuStructure && this.menuStructure.metadata && this.menuStructure.metadata.restaurantName) {
                 console.log('Rendering restaurant name');
@@ -61,14 +109,10 @@ class ContentEditor {
             }
 
             // Render each section
-            if (this.editedContent && this.editedContent.sections) {
-                console.log('Rendering sections:', this.editedContent.sections.length);
-                this.editedContent.sections.forEach((section, sectionIndex) => {
-                    this.renderSection(section, sectionIndex);
-                });
-            } else {
-                console.error('No sections to render');
-            }
+            console.log('Rendering sections:', this.editedContent.sections.length);
+            this.editedContent.sections.forEach((section, sectionIndex) => {
+                this.renderSection(section, sectionIndex);
+            });
 
             // Add new section button
             console.log('Adding new section button');
