@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Chef - Simple PDF Text Editor</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .subtitle { opacity: 0.9; }
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+        .sidebar {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .upload-zone {
+            border: 3px dashed #ccc;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+        .upload-zone:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: #667eea;
+            color: white;
+            margin: 10px 5px;
+        }
+        .btn:hover {
+            background: #5568d3;
+        }
+        .btn-success {
+            background: #27ae60;
+        }
+        .editor-canvas {
+            background: #fff;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            overflow: auto;
+            max-height: 800px;
+        }
+        .status {
+            padding: 15px;
+            background: #d4edda;
+            color: #155724;
+            border-radius: 6px;
+            margin: 10px 0;
+            display: none;
+        }
+        .status.show { display: block; }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .info-box h3 {
+            margin-bottom: 10px;
+            color: #1976d2;
+        }
+        .page-selector {
+            margin: 15px 0;
+        }
+        #editorContainer {
+            position: relative;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍽️ Menu Chef</h1>
+            <p class="subtitle">Edit PDF menus by clicking directly on the text</p>
+        </header>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div id="uploadSection">
+                    <h2>Upload Menu</h2>
+                    <div class="upload-zone" id="uploadZone">
+                        <p>📄</p>
+                        <p>Drop PDF here</p>
+                        <p style="margin: 10px 0;">or</p>
+                        <button class="btn" onclick="document.getElementById('fileInput').click()">Select File</button>
+                        <input type="file" id="fileInput" accept=".pdf" style="display: none;">
+                    </div>
+                    <div class="status" id="status"></div>
+                </div>
+
+                <div id="controlsSection" style="display: none;">
+                    <h2>Controls</h2>
+                    <div class="info-box">
+                        <h3>How to Edit:</h3>
+                        <ol style="margin-left: 20px; line-height: 1.8;">
+                            <li>Click any text to edit</li>
+                            <li>Type your changes</li>
+                            <li>Click outside to save</li>
+                            <li>Download when done</li>
+                        </ol>
+                    </div>
+
+                    <div class="page-selector" id="pageSelector"></div>
+
+                    <button class="btn btn-success" id="downloadBtn" style="width: 100%;">
+                        💾 Download Edited PDF
+                    </button>
+
+                    <button class="btn" id="resetBtn" style="width: 100%; background: #95a5a6;">
+                        🔄 Start Over
+                    </button>
+                </div>
+            </div>
+
+            <div class="editor-canvas">
+                <div id="editorContainer"></div>
+                <div id="placeholder" style="text-align: center; padding: 100px 20px; color: #999;">
+                    <h2>👆 Upload a PDF menu to start editing</h2>
+                    <p style="margin-top: 10px;">The original design will be preserved - you'll only edit the text</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        let pdfData = null;
+        let currentPage = 1;
+
+        const fileInput = document.getElementById('fileInput');
+        const uploadZone = document.getElementById('uploadZone');
+        const status = document.getElementById('status');
+        const editorContainer = document.getElementById('editorContainer');
+        const placeholder = document.getElementById('placeholder');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // Upload handlers
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                loadPDF(fileInput.files[0]);
+            }
+        });
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.style.borderColor = '#667eea';
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.style.borderColor = '#ccc';
+            if (e.dataTransfer.files.length > 0) {
+                loadPDF(e.dataTransfer.files[0]);
+            }
+        });
+
+        // Load and process PDF
+        async function loadPDF(file) {
+            showStatus('Loading PDF...', false);
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+                pdfData = {
+                    pdfDoc: pdf,
+                    fileName: file.name,
+                    pages: [],
+                    textLayers: []
+                };
+
+                // Process first page
+                await loadPage(1);
+
+                // Setup page selector if multiple pages
+                if (pdf.numPages > 1) {
+                    setupPageSelector(pdf.numPages);
+                }
+
+                showStatus(`✅ Loaded ${pdf.numPages} page(s). Click any text to edit!`, false);
+                document.getElementById('uploadSection').style.display = 'none';
+                document.getElementById('controlsSection').style.display = 'block';
+                placeholder.style.display = 'none';
+
+            } catch (error) {
+                showStatus('Error: ' + error.message, true);
+            }
+        }
+
+        async function loadPage(pageNum) {
+            const page = await pdfData.pdfDoc.getPage(pageNum);
+            const viewport = page.getViewport({ scale: 1.5 });
+
+            // Render page to canvas (background)
+            const canvas = document.createElement('canvas');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            const ctx = canvas.getContext('2d');
+
+            await page.render({
+                canvasContext: ctx,
+                viewport: viewport
+            }).promise;
+
+            const backgroundImage = canvas.toDataURL('image/png');
+
+            // Extract text
+            const textContent = await page.getTextContent();
+            const textItems = textContent.items.map(item => ({
+                original: item.str,
+                text: item.str,
+                x: item.transform[4] * 1.5,
+                y: (viewport.height / 1.5 - item.transform[5]) * 1.5,
+                fontSize: Math.abs(item.transform[3]) * 1.5,
+                width: item.width * 1.5
+            }));
+
+            pdfData.pages[pageNum - 1] = {
+                backgroundImage,
+                viewport: { width: viewport.width, height: viewport.height }
+            };
+            pdfData.textLayers[pageNum - 1] = textItems;
+
+            renderEditor(pageNum);
+        }
+
+        function renderEditor(pageNum) {
+            const pageData = pdfData.pages[pageNum - 1];
+            const textItems = pdfData.textLayers[pageNum - 1];
+
+            editorContainer.innerHTML = '';
+            editorContainer.style.width = pageData.viewport.width + 'px';
+            editorContainer.style.height = pageData.viewport.height + 'px';
+            editorContainer.style.position = 'relative';
+
+            // Background
+            const bg = document.createElement('img');
+            bg.src = pageData.backgroundImage;
+            bg.style.position = 'absolute';
+            bg.style.top = '0';
+            bg.style.left = '0';
+            bg.style.pointerEvents = 'none';
+            editorContainer.appendChild(bg);
+
+            // Text overlays
+            textItems.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.contentEditable = true;
+                div.textContent = item.text;
+                div.style.position = 'absolute';
+                div.style.left = item.x + 'px';
+                div.style.top = item.y + 'px';
+                div.style.fontSize = item.fontSize + 'px';
+                div.style.fontFamily = 'Arial, sans-serif';
+                div.style.background = 'rgba(255, 255, 255, 0.7)';
+                div.style.padding = '2px 4px';
+                div.style.border = '1px dashed transparent';
+                div.style.cursor = 'text';
+                div.style.minWidth = '10px';
+                div.style.whiteSpace = 'pre';
+
+                div.addEventListener('focus', () => {
+                    div.style.border = '1px dashed #667eea';
+                    div.style.background = 'rgba(255, 255, 255, 0.95)';
+                });
+
+                div.addEventListener('blur', () => {
+                    item.text = div.textContent;
+                    div.style.border = '1px dashed transparent';
+                    div.style.background = 'rgba(255, 255, 255, 0.7)';
+                });
+
+                editorContainer.appendChild(div);
+            });
+        }
+
+        function setupPageSelector(numPages) {
+            const selector = document.getElementById('pageSelector');
+            selector.innerHTML = '<h3>Pages:</h3>';
+            for (let i = 1; i <= numPages; i++) {
+                const btn = document.createElement('button');
+                btn.textContent = i;
+                btn.className = 'btn';
+                btn.style.width = '50px';
+                btn.onclick = async () => {
+                    if (!pdfData.pages[i - 1]) {
+                        await loadPage(i);
+                    } else {
+                        renderEditor(i);
+                    }
+                    currentPage = i;
+                };
+                selector.appendChild(btn);
+            }
+        }
+
+        // Download edited PDF
+        downloadBtn.addEventListener('click', async () => {
+            showStatus('Generating PDF...', false);
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const firstPage = pdfData.pages[0];
+                const pdf = new jsPDF({
+                    unit: 'px',
+                    format: [firstPage.viewport.width, firstPage.viewport.height]
+                });
+
+                for (let i = 0; i < pdfData.pages.length; i++) {
+                    if (i > 0) pdf.addPage();
+
+                    const page = pdfData.pages[i];
+                    const texts = pdfData.textLayers[i];
+
+                    // Background
+                    pdf.addImage(page.backgroundImage, 'PNG', 0, 0, page.viewport.width, page.viewport.height);
+
+                    // Text overlay
+                    pdf.setTextColor(0, 0, 0);
+                    texts.forEach(item => {
+                        pdf.setFontSize(item.fontSize);
+                        pdf.text(item.text, item.x, item.y);
+                    });
+                }
+
+                pdf.save(pdfData.fileName.replace('.pdf', '_edited.pdf'));
+                showStatus('✅ PDF downloaded!', false);
+
+            } catch (error) {
+                showStatus('Error generating PDF: ' + error.message, true);
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            if (confirm('Start over? Edits will be lost.')) {
+                location.reload();
+            }
+        });
+
+        function showStatus(msg, isError) {
+            status.textContent = msg;
+            status.className = 'status show' + (isError ? ' error' : '');
+        }
+    </script>
+</body>
+</html>
