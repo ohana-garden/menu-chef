@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  agent-zero:
+    image: agent0ai/agent-zero:latest
+    container_name: menu-chef-agent-zero
+    ports:
+      - "50001:80"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    volumes:
+      - ./prompts:/app/prompts
+      - ./agent-work:/app/work
+    restart: unless-stopped
+    networks:
+      - menu-chef-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: menu-chef-frontend
+    ports:
+      - "3000:80"
+    environment:
+      - AGENT_ZERO_API=http://agent-zero:80
+    depends_on:
+      - agent-zero
+    networks:
+      - menu-chef-network
+    restart: unless-stopped
+
+networks:
+  menu-chef-network:
+    driver: bridge
+
+volumes:
+  agent-work:

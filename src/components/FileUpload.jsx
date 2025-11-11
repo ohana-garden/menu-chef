@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './FileUpload.css';
 
-function FileUpload({ onFileUploaded }) {
+function FileUpload({ onFileSelected }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
   const [dragActive, setDragActive] = useState(false);
@@ -25,22 +25,9 @@ function FileUpload({ onFileUploaded }) {
     setError(null);
     setUploading(true);
 
-    const formData = new FormData();
-    formData.append('menu', file);
-
     try {
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Upload failed');
-      }
-
-      const data = await response.json();
-      onFileUploaded(data);
+      // Pass file to parent for browser-based parsing
+      onFileSelected(file);
     } catch (err) {
       setError(err.message);
     } finally {
