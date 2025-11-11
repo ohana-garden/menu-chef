@@ -1,0 +1,156 @@
+.menu-preview {
+  height: 100%;
+  overflow-y: auto;
+  background: #f9f9f9;
+  padding: 30px;
+}
+
+.menu-document {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  padding: 60px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  min-height: 100%;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menu-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.menu-title {
+  font-size: 42px;
+  font-weight: 700;
+  color: #222;
+  margin: 0 0 15px;
+  font-family: 'Georgia', serif;
+  letter-spacing: 1px;
+}
+
+.menu-tagline {
+  font-size: 16px;
+  color: #666;
+  font-style: italic;
+  margin: 0 0 25px;
+}
+
+.menu-divider {
+  width: 100px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #667eea, transparent);
+  margin: 0 auto;
+}
+
+.menu-body {
+  margin-bottom: 40px;
+}
+
+.menu-section {
+  margin-bottom: 45px;
+}
+
+.section-title {
+  font-size: 26px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 25px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #eee;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-family: 'Georgia', serif;
+}
+
+.section-items {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.menu-item {
+  padding: 8px 0;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 15px;
+  margin-bottom: 8px;
+}
+
+.item-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #222;
+  margin: 0;
+  flex: 1;
+}
+
+.item-price {
+  font-size: 17px;
+  font-weight: 600;
+  color: #667eea;
+  white-space: nowrap;
+}
+
+.item-description {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.7;
+  margin: 0;
+  padding-left: 12px;
+  font-style: italic;
+}
+
+.menu-footer {
+  text-align: center;
+  padding-top: 30px;
+  border-top: 1px solid #eee;
+  color: #999;
+  font-size: 12px;
+}
+
+.preview-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #999;
+  font-size: 16px;
+}
+
+/* Print styles */
+@media print {
+  .menu-preview {
+    padding: 0;
+    background: white;
+  }
+
+  .menu-document {
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  .menu-footer {
+    page-break-before: avoid;
+  }
+
+  .menu-section {
+    page-break-inside: avoid;
+  }
+}
